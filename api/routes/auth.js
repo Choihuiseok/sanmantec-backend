@@ -2,7 +2,7 @@ const router = require("express").Router();
 const auth = require("../controllers/authController");
 
 // 🔥 추가해야 했던 부분 (오류 원인)
-const codeStore = require("../storage/codeStore");
+const codeStore = require("../utils/codeStore");
 
 // 회원가입
 router.post("/register", auth.register);
