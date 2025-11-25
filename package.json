@@ -1,0 +1,25 @@
+{
+  "name": "sanmantec-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "caver-js": "^1.12.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "express": "^4.21.2",
+    "nodemailer": "^7.0.10",
+    "pg": "^8.16.3",
+    "resend": "^6.5.2",
+    "serverless-http": "^3.2.0"
+  }
+}
