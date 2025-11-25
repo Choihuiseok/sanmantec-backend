@@ -52,7 +52,7 @@ exports.sendCode = async (req, res) => {
 // 3. 인증번호 검증
 // =============================
 // 📌 이메일 인증 코드 확인
-e// authController.js
+// authController.js
 
 const codeStore = require("../utils/codeStore");
 
