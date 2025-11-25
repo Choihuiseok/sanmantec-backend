@@ -59,18 +59,14 @@ const codeStore = require("../utils/codeStore");
 exports.verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
-  const saved = codeStore.getCode(email);
+  const ok = codeStore.verify(email, code);  // ⭐ verify 사용
 
-  if (!saved) {
-    return res.status(400).json({ message: "코드가 존재하지 않습니다." });
+  if (!ok) {
+    return res.status(400).json({ message: "잘못된 인증번호 또는 시간초과" });
   }
 
-  if (saved !== code) {
-    return res.status(400).json({ message: "잘못된 인증번호입니다." });
-  }
+  codeStore.remove(email);  // ⭐ deleteCode → remove로 수정
 
-  // 성공 처리
-  codeStore.deleteCode(email);
   return res.status(200).json({ message: "인증 성공" });
 };
 
