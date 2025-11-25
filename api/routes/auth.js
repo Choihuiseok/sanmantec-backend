@@ -1,6 +1,9 @@
 const router = require("express").Router();
 const auth = require("../controllers/authController");
 
+// 🔥 추가해야 했던 부분 (오류 원인)
+const codeStore = require("../storage/codeStore");
+
 // 회원가입
 router.post("/register", auth.register);
 
@@ -32,6 +35,5 @@ router.post("/verify-code", (req, res) => {
 
   return res.json({ success: true, message: "인증 성공" });
 });
-
 
 module.exports = router;
