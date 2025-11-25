@@ -52,23 +52,26 @@ exports.sendCode = async (req, res) => {
 // 3. 인증번호 검증
 // =============================
 // 📌 이메일 인증 코드 확인
-exports.verifyCode = (req, res) => {
+e// authController.js
+
+const codeStore = require("../utils/codeStore");
+
+exports.verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
-  if (!email || !code) {
-    return res.status(400).json({ success: false, message: "이메일과 인증코드를 입력하세요." });
+  const saved = codeStore.getCode(email);
+
+  if (!saved) {
+    return res.status(400).json({ message: "코드가 존재하지 않습니다." });
   }
 
-  const isValid = codeStore.verify(email, code);
-
-  if (!isValid) {
-    return res.status(400).json({ success: false, message: "인증번호가 틀렸거나 만료되었습니다." });
+  if (saved !== code) {
+    return res.status(400).json({ message: "잘못된 인증번호입니다." });
   }
 
-  // 인증 성공 → 저장된 인증번호 삭제
-  codeStore.remove(email);
-
-  return res.json({ success: true, message: "이메일 인증 성공!" });
+  // 성공 처리
+  codeStore.deleteCode(email);
+  return res.status(200).json({ message: "인증 성공" });
 };
 
 // =============================
