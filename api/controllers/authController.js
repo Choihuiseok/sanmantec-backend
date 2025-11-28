@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
-const Mailer = require("../config/mail");   // SendGrid mail.js
+const Mailer = require("../config/mail");
 const CodeStore = require("../utils/codeStore");
+const jwt = require("../utils/jwt");   // 🎯 반드시 필요! (token 생성)
+
 
 // =============================
 // 1. 이메일 중복확인
@@ -24,6 +26,7 @@ exports.checkEmail = async (req, res) => {
     res.status(500).json({ message: "서버 오류" });
   }
 };
+
 
 // =============================
 // 2. 이메일 인증번호 전송
@@ -48,27 +51,24 @@ exports.sendCode = async (req, res) => {
   }
 };
 
+
 // =============================
 // 3. 인증번호 검증
 // =============================
-// 📌 이메일 인증 코드 확인
-// authController.js
-
-const codeStore = require("../utils/codeStore");
-
 exports.verifyCode = async (req, res) => {
   const { email, code } = req.body;
 
-  const ok = codeStore.verify(email, code);  // ⭐ verify 사용
+  const ok = CodeStore.verify(email, code);
 
   if (!ok) {
     return res.status(400).json({ message: "잘못된 인증번호 또는 시간초과" });
   }
 
-  codeStore.remove(email);  // ⭐ deleteCode → remove로 수정
+  CodeStore.remove(email);
 
   return res.status(200).json({ message: "인증 성공" });
 };
+
 
 // =============================
 // 4. 회원가입
@@ -93,8 +93,9 @@ exports.register = async (req, res) => {
   }
 };
 
+
 // =============================
-// 5. 로그인 (지갑 address + token 포함 버전)
+// 5. 로그인 (token + 지갑 address 포함 버전)
 // =============================
 exports.login = async (req, res) => {
   try {
@@ -122,10 +123,9 @@ exports.login = async (req, res) => {
     const walletAddress =
       walletRes.rows.length > 0 ? walletRes.rows[0].address : null;
 
-    // 🔥 token 생성 (필수!)
+    // 🔥 token 생성 (필수!!)
     const token = jwt.sign({ id: row.id, email: row.email });
 
-    // 🔥 token + user 반환
     res.json({
       message: "로그인 성공",
       token,
