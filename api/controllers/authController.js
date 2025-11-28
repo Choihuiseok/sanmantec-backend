@@ -94,7 +94,7 @@ exports.register = async (req, res) => {
 };
 
 // =============================
- 5. 로그인 (지갑 address 포함 버전)
+ //5. 로그인 (지갑 address 포함 버전)
 // =============================
 exports.login = async (req, res) => {
   try {
