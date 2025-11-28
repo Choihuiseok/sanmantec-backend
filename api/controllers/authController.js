@@ -94,7 +94,7 @@ exports.register = async (req, res) => {
 };
 
 // =============================
- //5. 로그인 (지갑 address 포함 버전)
+// 5. 로그인 (지갑 address + token 포함 버전)
 // =============================
 exports.login = async (req, res) => {
   try {
@@ -113,7 +113,7 @@ exports.login = async (req, res) => {
     if (!ok)
       return res.status(401).json({ message: "이메일 또는 비밀번호 오류" });
 
-    // 🔥 추가: user_wallets 에서 지갑 주소 조회
+    // 🔥 user_wallets 조회
     const walletRes = await pool.query(
       "SELECT address FROM user_wallets WHERE user_id=$1 ORDER BY id DESC LIMIT 1",
       [row.id]
@@ -122,12 +122,17 @@ exports.login = async (req, res) => {
     const walletAddress =
       walletRes.rows.length > 0 ? walletRes.rows[0].address : null;
 
+    // 🔥 token 생성 (필수!)
+    const token = jwt.sign({ id: row.id, email: row.email });
+
+    // 🔥 token + user 반환
     res.json({
       message: "로그인 성공",
+      token,
       user: {
         id: row.id,
         email: row.email,
-        walletAddress,   // 🔥 지갑 주소 프론트에 전달
+        walletAddress,
       },
     });
 
