@@ -1,63 +1,78 @@
-const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 
+// ===============================
+// 1. 지갑 주소 저장 (메타마스크 방식)
+// ===============================
 exports.saveWallet = async (req, res) => {
-  const { userId, address, keystore } = req.body;
+  const { userId, address } = req.body;
 
-  if (!userId || !address || !keystore)
-    return res.status(400).json({ message: "userId, address, keystore 필요" });
-
-  try {
-    await pool.query(
-      "INSERT INTO wallets (user_id, address, keystore_json) VALUES ($1,$2,$3)",
-      [userId, address, keystore]
-    );
-
-    res.json({ message: "지갑 저장 성공", address });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "지갑 저장 실패" });
+  if (!userId || !address) {
+    return res.status(400).json({ message: "userId, address 필요" });
   }
-};
-
-exports.getWallets = async (req, res) => {
-  const { userId } = req.params;
 
   try {
-    const result = await pool.query(
-      "SELECT address, keystore_json FROM wallets WHERE user_id=$1 ORDER BY id DESC",
-      [userId]
-    );
-
-    res.json({ wallets: result.rows });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "지갑 목록 조회 실패" });
-  }
-};
-
-exports.deleteWallet = async (req, res) => {
-  const { userId, password, address } = req.body;
-
-  try {
-    const u = await pool.query(
-      "SELECT password_hash FROM users WHERE user_id=$1",
-      [userId]
-    );
-    const user = u.rows[0];
-    if (!user) return res.status(401).json({ message: "인증 실패" });
-
-    const ok = await bcrypt.compare(password, user.password_hash);
-    if (!ok) return res.status(401).json({ message: "인증 실패" });
-
+    // 같은 userId는 한 개의 주소만 유지하도록 UNIQUE(user_id) 를 사용하는 방식
     await pool.query(
-      "DELETE FROM wallets WHERE user_id=$1 AND address=$2",
+      `
+      INSERT INTO user_wallets (user_id, address)
+      VALUES ($1, $2)
+      ON CONFLICT (user_id)
+      DO UPDATE SET address = EXCLUDED.address;
+      `,
       [userId, address]
     );
 
+    res.json({ message: "지갑 주소 저장 성공", address });
+
+  } catch (err) {
+    console.error("saveWallet Error:", err);
+    res.status(500).json({ message: "DB 저장 실패" });
+  }
+};
+
+// ===============================
+// 2. 지갑 주소 조회
+// ===============================
+exports.getWallet = async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId)
+    return res.status(400).json({ message: "userId 필요" });
+
+  try {
+    const result = await pool.query(
+      "SELECT id, address, created_at FROM user_wallets WHERE user_id=$1 LIMIT 1",
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({ wallet: null });
+    }
+
+    res.json({ wallet: result.rows[0] });
+
+  } catch (err) {
+    console.error("getWallet Error:", err);
+    res.status(500).json({ message: "지갑 조회 실패" });
+  }
+};
+
+// ===============================
+// 3. 지갑 삭제 (선택 기능)
+// ===============================
+exports.deleteWallet = async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId)
+    return res.status(400).json({ message: "userId 필요" });
+
+  try {
+    await pool.query("DELETE FROM user_wallets WHERE user_id=$1", [userId]);
+
     res.json({ message: "지갑 삭제 완료" });
-  } catch (e) {
-    console.error(e);
+
+  } catch (err) {
+    console.error("deleteWallet Error:", err);
     res.status(500).json({ message: "지갑 삭제 실패" });
   }
 };

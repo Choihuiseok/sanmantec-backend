@@ -5,7 +5,7 @@ exports.submitTx = async (req, res) => {
   try {
     const { to, value, data } = req.body;
 
-    const receipt = await contract.methods
+    const receipt = await vault.methods
       .submit(to, value, data)
       .send({ from: wallet.address, gas: 500000 });
 

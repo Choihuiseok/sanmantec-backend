@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const contract = require("../config/contract");
+const contract = require("../config/vaultContract");
 
 router.get("/test-contract", async (req, res) => {
   try {
