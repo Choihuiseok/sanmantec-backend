@@ -1,4 +1,4 @@
-const contract = require("../config/contract");
+const contract = require("../config/vaultContract");
 const { wallet } = require("../config/caver");
 
 exports.submitTx = async (req, res) => {

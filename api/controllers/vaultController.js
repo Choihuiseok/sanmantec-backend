@@ -1,5 +1,5 @@
 const { caver, wallet } = require("../config/caver");
-const vault = require("../config/contract");
+const vault = require("../config/vaultContract");
 
 // Helper: enum 값 → 문자열로 보기 좋게 변환 (선택)
 const VaultState = {
