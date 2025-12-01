@@ -1,5 +1,5 @@
 const Caver = require("caver-js");
-const ABI = require("../contractABI.json");
+const ABI = require("../vault_abi.json");
 require("dotenv").config();
 
 const caver = new Caver(process.env.RPC_URL);
