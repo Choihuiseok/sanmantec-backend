@@ -1,5 +1,5 @@
 // ===============================
-// Sanmantec Backend – index.js (FINAL)
+// Sanmantec Backend – index.js (FINAL CLEAN)
 // ===============================
 
 const express = require("express");
@@ -24,12 +24,13 @@ app.use(
 // ===============================
 const authRoutes = require("./routes/auth");
 const chainRoutes = require("./routes/chain");
-const contractRoutes = require("./routes/contract");
+// ❌ 기존 contractRoutes 제거 (Railway 에러 원인)
+// const contractRoutes = require("./routes/contract");
 const walletRoutes = require("./routes/wallet");
 const sendRoutes = require("./routes/send");
 const testRoutes = require("./routes/test");
 
-// 🔥 추가된 Vault 라우트
+// 🔥 새로 추가한 Vault 라우트
 const vaultRoutes = require("./routes/vault.routes");
 
 // ===============================
@@ -41,15 +42,18 @@ app.get("/", (req, res) => {
 
 // ===============================
 // 프론트 기준 API 경로 연결
-// ================================
+// ===============================
 app.use("/auth", authRoutes);
 app.use("/wallet", walletRoutes);
 
-// 🔥 vault 정상 활성화
+// 🔥 vault 라우트 활성화
 app.use("/vault", vaultRoutes);
 
 app.use("/chain", chainRoutes);
-app.use("/contract", contractRoutes);
+
+// ❌ 기존 contract 라우트 제거
+// app.use("/contract", contractRoutes);
+
 app.use("/send", sendRoutes);
 app.use("/test", testRoutes);
 
