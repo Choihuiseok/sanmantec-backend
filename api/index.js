@@ -31,7 +31,7 @@ const sendRoutes = require("./routes/send");
 const testRoutes = require("./routes/test");
 
 // 🔥 새로 추가한 Vault 라우트
-const vaultRoutes = require("./routes/vault.routes");
+const vaultRoutes = require("./routes/vault");
 
 // ===============================
 // 헬스체크
